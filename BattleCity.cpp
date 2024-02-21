@@ -1,73 +1,68 @@
 // BATTLECITY.cpp : Defines the entry point for the application.
 //
 
-#include "stdafx.h"
 #include "BattleCity.h"
 #include "Game.h"
+#include "NewGame.h"
 #include "gdiplus.h"
+#include "stdafx.h"
 
- using namespace Gdiplus;
+using namespace Gdiplus;
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;								// current instance
-TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
-TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
+HINSTANCE hInst;                     // current instance
+TCHAR szTitle[MAX_LOADSTRING];       // The title bar text
+TCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
+
+GameManager gameInstance;
 
 // Forward declarations of functions included in this code module:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPTSTR    lpCmdLine,
-                     int       nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                       LPTSTR lpCmdLine, int nCmdShow) {
+  UNREFERENCED_PARAMETER(hPrevInstance);
+  UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// Переменные для инициализации GDI+
-	ULONG_PTR gdipToken = NULL;
-	GdiplusStartupInput gdipStartupInput;
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GDI+
+  ULONG_PTR gdipToken = NULL;
+  GdiplusStartupInput gdipStartupInput;
 
-	// Инициализация GDI+
-	GdiplusStartup(&gdipToken, &gdipStartupInput, NULL);
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GDI+
+  GdiplusStartup(&gdipToken, &gdipStartupInput, NULL);
 
-	MSG msg;
-	HACCEL hAccelTable;
+  MSG msg;
+  HACCEL hAccelTable;
 
-	// Initialize global strings
-	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadString(hInstance, IDC_BATTLECITY, szWindowClass, MAX_LOADSTRING);
-	MyRegisterClass(hInstance);
+  // Initialize global strings
+  LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+  LoadString(hInstance, IDC_BATTLECITY, szWindowClass, MAX_LOADSTRING);
+  MyRegisterClass(hInstance);
 
-	// Perform application initialization:
-	if (!InitInstance (hInstance, nCmdShow))
-	{
-		return FALSE;
-	}
+  // Perform application initialization:
+  if (!InitInstance(hInstance, nCmdShow)) {
+    return FALSE;
+  }
 
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_BATTLECITY));
+  hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_BATTLECITY));
 
-	// Main message loop:
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
+  // Main message loop:
+  while (GetMessage(&msg, NULL, 0, 0)) {
+    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
+  }
 
-	// Деинициализация GDI+
-	GdiplusShutdown(gdipToken);
+  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GDI+
+  GdiplusShutdown(gdipToken);
 
-	return (int) msg.wParam;
+  return (int)msg.wParam;
 }
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -78,29 +73,28 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 //
 //    This function and its usage are only necessary if you want this code
 //    to be compatible with Win32 systems prior to the 'RegisterClassEx'
-//    function that was added to Windows 95. It is important to call this function
-//    so that the application will get 'well formed' small icons associated
-//    with it.
+//    function that was added to Windows 95. It is important to call this
+//    function so that the application will get 'well formed' small icons
+//    associated with it.
 //
-ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
+ATOM MyRegisterClass(HINSTANCE hInstance) {
+  WNDCLASSEX wcex;
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
+  wcex.cbSize = sizeof(WNDCLASSEX);
 
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BATTLECITY));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_BATTLECITY);
-	wcex.lpszClassName	= szWindowClass;
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+  wcex.style = CS_HREDRAW | CS_VREDRAW;
+  wcex.lpfnWndProc = WndProc;
+  wcex.cbClsExtra = 0;
+  wcex.cbWndExtra = 0;
+  wcex.hInstance = hInstance;
+  wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_BATTLECITY));
+  wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+  wcex.lpszMenuName = MAKEINTRESOURCE(IDC_BATTLECITY);
+  wcex.lpszClassName = szWindowClass;
+  wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-	return RegisterClassEx(&wcex);
+  return RegisterClassEx(&wcex);
 }
 
 //
@@ -113,31 +107,27 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
 //
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-	HWND hWnd;
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
+  HWND hWnd;
 
-	hInst = hInstance; // Store instance handle in our global variable
+  hInst = hInstance; // Store instance handle in our global variable
 
-	// Определяем стиль окна
-	long windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+  long windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
 
-	// Размер окна
-	int w = WIDTH * CELL_SIZE + 6;
-	int h = HEIGHT * CELL_SIZE + 16 + 48;
+  int w = (COLUMN_COUNT + 1) * CELLS_SIZE;
+  int h = (ROW_COUNT + 1) * CELLS_SIZE + 32; // 32 is the header probably idn
 
-	hWnd = CreateWindow(szWindowClass, szTitle, windowStyle,
-	  CW_USEDEFAULT, 0, w, h, NULL, NULL, hInstance, NULL);
+  hWnd = CreateWindow(szWindowClass, szTitle, windowStyle, CW_USEDEFAULT, 0, w,
+                      h, NULL, NULL, hInstance, NULL);
 
-	if (!hWnd)
-	{
-	  return FALSE;
-	}
+  if (!hWnd) {
+    return FALSE;
+  }
 
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
+  ShowWindow(hWnd, nCmdShow);
+  UpdateWindow(hWnd);
 
-	return TRUE;
+  return TRUE;
 }
 
 //
@@ -150,81 +140,76 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY	- post a quit message and return
 //
 //
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	int wmId, wmEvent;
-	PAINTSTRUCT ps;
-	HDC hdc;
-	Game Go;
-	switch (message)
-	{
-	case WM_CREATE:
-		Go.loadTextures();
-		// установка таймера кадров и брони
-		SetTimer(hWnd, FRAME_TIMER, FRAME_PERIOD, (TIMERPROC)NULL);
-		SetTimer(hWnd, ARMOR_TIMER, ARMOR_PERIOD, (TIMERPROC)NULL);
-		break;
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		// Parse the menu selections:
-		switch (wmId)
-		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
-		case IDM_NEWGAME:
-			Go.startNewGame(hWnd);
-			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			system("exit");
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
-	case WM_ERASEBKGND:
-		// Подавление события стирания фона (чтобы избежать мерцания)
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		Go.paint(hdc);
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_TIMER:
-		// обработка таймеров
-		Go.processTimers(hWnd, wParam);
-		break;
-	case WM_DESTROY:
-		// удаление таймеров
-		KillTimer(hWnd, ARMOR_TIMER);
-		KillTimer(hWnd, FRAME_TIMER);
-		Go.freeTextures();
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	return 0;
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
+                         LPARAM lParam) {
+  int wmId, wmEvent;
+  PAINTSTRUCT ps;
+  HDC hdc;
+  // Game Go;
+
+  switch (message) {
+  case WM_CREATE:
+    gameInstance.init();
+    // Go.loadTextures();
+    SetTimer(hWnd, FRAME_TIMER, FRAME_PERIOD, (TIMERPROC)NULL);
+    // SetTimer(hWnd, ARMOR_TIMER, ARMOR_PERIOD, (TIMERPROC)NULL);
+    break;
+  case WM_COMMAND:
+    wmId = LOWORD(wParam);
+    wmEvent = HIWORD(wParam);
+    // Parse the menu selections:
+    switch (wmId) {
+    case IDM_ABOUT:
+      DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+      break;
+    case IDM_NEWGAME:
+      gameInstance.reset();
+      break;
+    case IDM_EXIT:
+      DestroyWindow(hWnd);
+      system("exit");
+      break;
+    default:
+      return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    break;
+  case WM_ERASEBKGND:
+    break;
+  case WM_PAINT:
+    hdc = BeginPaint(hWnd, &ps);
+    gameInstance.draw(hdc);
+    EndPaint(hWnd, &ps);
+    break;
+  case WM_TIMER:
+    gameInstance.update();
+    InvalidateRect(hWnd, NULL, false);
+    // Go.processTimers(hWnd, wParam);
+    break;
+  case WM_DESTROY:
+    // KillTimer(hWnd, ARMOR_TIMER);
+    KillTimer(hWnd, FRAME_TIMER);
+    // Go.freeTextures();
+    PostQuitMessage(0);
+    break;
+  default:
+    return DefWindowProc(hWnd, message, wParam, lParam);
+  }
+  return 0;
 }
 
 // Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+  UNREFERENCED_PARAMETER(lParam);
+  switch (message) {
+  case WM_INITDIALOG:
+    return (INT_PTR)TRUE;
 
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
+  case WM_COMMAND:
+    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+      EndDialog(hDlg, LOWORD(wParam));
+      return (INT_PTR)TRUE;
+    }
+    break;
+  }
+  return (INT_PTR)FALSE;
 }
