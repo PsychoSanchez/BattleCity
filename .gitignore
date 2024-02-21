@@ -27,3 +27,9 @@
 *.out
 *.app
 Debug/
+.vs
+.vscode
+BattleCity/
+asms
+idw
+ipch

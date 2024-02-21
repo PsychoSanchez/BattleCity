@@ -1,11 +1,19 @@
 // BATTLECITY.cpp : Defines the entry point for the application.
 //
+module;
 
-#include "BattleCity.h"
-#include "Game.h"
-#include "NewGame.h"
+#include <windows.h>
 #include "gdiplus.h"
-#include "stdafx.h"
+
+#include <tchar.h>
+
+#include "resource.h"
+
+import game;
+import constants;
+
+
+
 
 using namespace Gdiplus;
 #define MAX_LOADSTRING 100
@@ -213,3 +221,5 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
   }
   return (INT_PTR)FALSE;
 }
+
+export module battlecity;
