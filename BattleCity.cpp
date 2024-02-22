@@ -12,9 +12,6 @@ module;
 import game;
 import constants;
 
-
-
-
 using namespace Gdiplus;
 #define MAX_LOADSTRING 100
 
@@ -121,9 +118,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   hInst = hInstance; // Store instance handle in our global variable
 
   long windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-
-  int w = (COLUMN_COUNT + 1) * CELLS_SIZE;
-  int h = (ROW_COUNT + 1) * CELLS_SIZE + 32; // 32 is the header probably idn
+  int scoreboardHeight = 16;
+  int w = (COLUMN_COUNT + 1) * CELLS_SIZE - (CELLS_SIZE / 2); // we -0.5 from width to crop
+  int h = (ROW_COUNT + 1) * CELLS_SIZE + 32 + scoreboardHeight + scoreboardHeight; // 32 is the header probably idn and scoreboard on top and bottom
 
   hWnd = CreateWindow(szWindowClass, szTitle, windowStyle, CW_USEDEFAULT, 0, w,
                       h, NULL, NULL, hInstance, NULL);
@@ -153,7 +150,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   int wmId, wmEvent;
   PAINTSTRUCT ps;
   HDC hdc;
-  // Game Go;
 
   switch (message) {
   case WM_CREATE:

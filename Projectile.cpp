@@ -12,6 +12,7 @@ private:
     bool isDestroyed = true;
     Vector2 position;
     LookDirection direction;
+    int playerId = -1;
 
 public:
     Projectile(Vector2 position, LookDirection direction) {
@@ -26,4 +27,6 @@ public:
     void setPosition(Vector2 position) { this->position = position; }
     LookDirection getDirection() { return direction; }
     void setDirection(LookDirection dir) { this->direction = dir; }
+    void setPlayerId(int playerId) { this->playerId =  playerId; }
+    int getPlayerId() { return this->playerId; }
 };

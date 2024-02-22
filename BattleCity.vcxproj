@@ -101,7 +101,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="Wall\Wall.cpp" />
+    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BattleCity.rc" />

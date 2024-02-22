@@ -23,5 +23,5 @@ export LookDirection CONTROL_TO_LOOK_DIRECTION_MAP[] = { Top, Down, Left, Right 
 
 export int COLUMN_COUNT = 30;
 export int ROW_COUNT = 20;
-export int CELLS_SIZE = 40;
+export int CELLS_SIZE = 32;
 export int SPAWN_POINTS[4][2] = { {0,0}, {COLUMN_COUNT - 1, 0}, {COLUMN_COUNT - 1, ROW_COUNT - 1}, {0, ROW_COUNT - 1} };

@@ -84,6 +84,7 @@ export class SpriteManager {
 private:
     Bitmap* texture;
     int cellSize;
+    int offsetY = 16;
 
 public:
     SpriteManager(Bitmap* texture, int cellSize) {
@@ -93,7 +94,7 @@ public:
 
     // x, y - cell coordinates (not pixels)
     void draw(Graphics* g, TextureCoordinates* meta, int x, int y) {
-        RectF dest = RectF(x * cellSize, y * cellSize, cellSize, cellSize);
+        RectF dest = RectF(x * cellSize, y * cellSize + offsetY, cellSize, cellSize);
         g->DrawImage(texture, dest, meta->x, meta->y, meta->width - 0.5, meta->height -0.5,
             meta->unit);
     }

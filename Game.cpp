@@ -36,9 +36,12 @@ export LookDirection getTankDirection(int* keys) {
 
 export class GameManager {
 private:
-    int columnCount, rowCount, cellSize;
+    bool isGameOver = false;
+    int columnCount, rowCount, cellSize, scoreboardHeight = 16;
+    int width, height;
     Bitmap* buffer;
     Graphics* graphics;
+    Bitmap* gameOverScreen;
     SpriteManager* spriteManager;
     vector<vector<unique_ptr<Wall>>> walls;
     vector<shared_ptr<Player>> tanks;
@@ -55,15 +58,25 @@ private:
         return wallType != WallType::Empty && wallType != WallType::Net;
     }
 
-    bool isTank(Vector2* position) {
+    shared_ptr<Player> getAliveTankFromPosition(Vector2* position) {
         for (auto& tank : tanks) {
             if (tank->getIsAlive() && tank->getX() == position->x &&
                 tank->getY() == position->y) {
-                return true;
+                return tank;
             }
         }
 
-        return false;
+        return nullptr;
+    }
+
+    shared_ptr<Player> getTankById(int id) {
+        for (auto& tank : tanks) {
+            if (tank->getId() == id) {
+                return tank;
+            }
+        }
+
+        return nullptr;
     }
 
     bool spawnAnimation(AnimationMeta* animationMeta, Vector2 postion) {
@@ -78,6 +91,28 @@ private:
         return false;
     }
 
+    void drawScorePanel() {
+        SolidBrush grayBrush(Color::Gray);
+        int expectedTextLength = 125;
+        int scoreRenderCoords[4][2] = {{0,0}, {columnCount * cellSize - expectedTextLength, 0}, {0, rowCount * cellSize - scoreboardHeight}, {columnCount * cellSize - expectedTextLength, rowCount * cellSize - scoreboardHeight}};
+        
+        Font font(L"Verdana", 10, FontStyleBold);
+        wstringstream wss;
+        
+        for (int i = 0; i < this->tanks.size(); i++) {
+            wss.str(L"");
+            wss << L"Kills: ";
+            wss << tanks[i]->getKillCount();
+            wss << L" Lives : ";
+            wss << tanks[i]->getLiveCount();
+            auto position = scoreRenderCoords[i];
+            PointF point(position[0], position[1]);
+            graphics->DrawString(wss.str().c_str(), wss.str().length(), &font, point, &grayBrush); 
+        }
+
+        // TODO: Render game time (top-center/bottom-center)
+    }
+
 public:
     void init() {
         columnCount = COLUMN_COUNT;
@@ -85,11 +120,12 @@ public:
         cellSize = CELLS_SIZE;
         int maxProjectileCount = 25;
 
-        int h = rowCount * cellSize;
-        int w = columnCount * cellSize;
+        height = (rowCount + 1) * cellSize + scoreboardHeight;
+        width = columnCount * cellSize;
 
-        buffer = new Bitmap(w, h);
+        buffer = new Bitmap(width, height);
         graphics = new Graphics(buffer);
+        gameOverScreen = Bitmap::FromFile(L"textures\\gameover.png");
         graphics->SetSmoothingMode(SmoothingModeNone);
 
         spriteManager =
@@ -107,19 +143,13 @@ public:
             animations.push_back(unique_ptr<Animation>(new Animation()));
         }
 
-        auto tank1 = shared_ptr<Player>(new Player(3, 0));
+        auto tank1 = shared_ptr<Player>(new Player(&PLAYER_1_CONFIG));
         tank1->setSpawn(0, 0, LookDirection::Down);
-        tank1->setControls(MOVEMENT_CONTROLS_1);
-        tank1->setFrames(TANK_A_FRAMES);
-        tank1->setFireControl(FIRE_CONTROL_1);
         tank1->spawn();
         tanks.push_back(tank1);
 
-        auto tank2 = shared_ptr<Player>(new Player(3, 0));
+        auto tank2 = shared_ptr<Player>(new Player(&PLAYER_2_CONFIG));
         tank2->setSpawn(columnCount - 1, rowCount - 1, LookDirection::Top);
-        tank2->setControls(MOVEMENT_CONTROLS_2);
-        tank2->setFrames(TANK_B_FRAMES);
-        tank2->setFireControl(FIRE_CONTROL_2);
         tank2->spawn();
         tanks.push_back(tank2);
     }
@@ -128,11 +158,17 @@ public:
         walls = GenerateWalls(columnCount, rowCount);
 
         for (auto& tank : tanks) {
-            tank->spawn();
+            tank->reset();
         }
+
+        isGameOver = false;
     }
 
     void update() {
+        if (isGameOver) {
+            return;
+        }
+
         for (auto& tank : tanks) {
             if (!tank->getIsAlive()) {
                 if (isButtonPressed(tank->getFireControl())) {
@@ -151,7 +187,7 @@ public:
                     GetPositionInDirection(tank->getPosition(), direction);
 
                 if (isInBounds(&newPosition) && !isWall(&newPosition) &&
-                    !isTank(&newPosition)) {
+                    getAliveTankFromPosition(&newPosition) == nullptr) {
                     tank->setPosition(newPosition);
                 }
 
@@ -161,9 +197,11 @@ public:
             if (isButtonPressed(tank->getFireControl())) {
                 auto position = tank->getPosition();
                 auto direction = tank->getDirection();
+                auto playerId = tank->getId();
 
                 for (auto& shot : shots) {
                     if (shot->getIsDestroyed()) {
+                        shot->setPlayerId(playerId);
                         shot->setPosition(position);
                         shot->setDirection(direction);
                         shot->setIsDestroyed(false);
@@ -197,14 +235,17 @@ public:
                 continue;
             }
 
-            if (isTank(&newPosition)) {
-                for (auto& tank : tanks) {
-                    if (tank->getPosition().x == newPosition.x &&
-                        tank->getPosition().y == newPosition.y) {
-                        tank->applyDamage();
-                        this->spawnAnimation(&EXPLOSION_ANIMATION, newPosition);
-
-                        break;
+            auto tank = this->getAliveTankFromPosition(&newPosition);
+            if (tank != nullptr) {
+                this->spawnAnimation(&EXPLOSION_ANIMATION, newPosition);
+                auto isAlive = tank->applyDamage();
+                
+                if (!isAlive) {
+                    auto playerId = shot->getPlayerId();
+                    auto creditedPlayer = this->getTankById(playerId);
+                    
+                    if (creditedPlayer != nullptr) {
+                        creditedPlayer->increaseKillCount();
                     }
                 }
 
@@ -214,9 +255,27 @@ public:
 
             shot->setPosition(newPosition);
         }
+
+        int aliveTanks = 0;
+        for (auto &tank : tanks) {
+            aliveTanks += tank->getLiveCount() > 0 ? 1 : 0;
+        }
+
+        this->isGameOver = aliveTanks < 2;
     }
 
     void draw(HDC hdc) {
+        // Render back graphics into the window
+        Graphics windowGraphics(hdc);
+        
+        if (isGameOver) {
+            graphics->Clear(Color::Black);
+            int padding = 16;
+            graphics->DrawImage(gameOverScreen, REAL(padding), REAL(padding), REAL(width - padding * 2), REAL(height - padding * 2));
+            windowGraphics.DrawImage(buffer, 0, 0);
+            return;
+        }
+
         graphics->Clear(Color::Black);
 
         for (auto& tank : tanks) {
@@ -263,8 +322,8 @@ public:
             }
         }
 
-        // Render back graphics into the window
-        Graphics windowGraphics(hdc);
+        this->drawScorePanel();
+
         windowGraphics.DrawImage(buffer, 0, 0);
     }
 };
