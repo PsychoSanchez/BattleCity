@@ -156,7 +156,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     gameInstance.init();
     // Go.loadTextures();
     SetTimer(hWnd, FRAME_TIMER, FRAME_PERIOD, (TIMERPROC)NULL);
-    // SetTimer(hWnd, ARMOR_TIMER, ARMOR_PERIOD, (TIMERPROC)NULL);
+    SetTimer(hWnd, ARMOR_TIMER, ARMOR_PERIOD, (TIMERPROC)NULL);
+    SetTimer(hWnd, HEALTH_TIMER, HEALTH_PERIOD, (TIMERPROC)NULL);
     break;
   case WM_COMMAND:
     wmId = LOWORD(wParam);
@@ -186,11 +187,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     break;
   case WM_TIMER:
     gameInstance.update();
+    switch (wParam) {
+      case HEALTH_TIMER:
+        gameInstance.spawnHealthPickup();
+        break;
+      case ARMOR_TIMER:
+        gameInstance.spawnArmorPickup();
+        break;
+    }
     InvalidateRect(hWnd, NULL, false);
     // Go.processTimers(hWnd, wParam);
     break;
   case WM_DESTROY:
-    // KillTimer(hWnd, ARMOR_TIMER);
+    KillTimer(hWnd, ARMOR_TIMER);
+    KillTimer(hWnd, HEALTH_TIMER);
     KillTimer(hWnd, FRAME_TIMER);
     // Go.freeTextures();
     PostQuitMessage(0);

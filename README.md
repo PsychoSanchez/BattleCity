@@ -12,3 +12,5 @@ Now it also allows to look into
 - C++ modules
 
 Built using Visual Studio 22 Community with enabled support for modules and C++ 23 standard
+
+![Game screenshot](https://raw.githubusercontent.com/PsychoSanchez/BattleCity/master/readme/screenshot.jpg)

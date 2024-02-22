@@ -64,6 +64,30 @@ export TextureCoordinates TANK_B_FRAMES[8] = {
     {6 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
 };
 
+export TextureCoordinates TANK_C_FRAMES[8] = {
+    {1 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {3 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {5 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {7 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    // Upgraded tank
+    {1 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {3 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {5 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {7 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+};
+
+export TextureCoordinates TANK_D_FRAMES[8] = {
+    {1 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {3 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {5 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {7 * TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    // Upgraded tank
+    {1 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {3 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {5 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+    {7 * TILE_SIZE, 4 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
+};
+
 export TextureCoordinates SHELL_FRAMES[] = {
     {3 * TILE_SIZE, 0 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
     {4 * TILE_SIZE, 0 * TILE_SIZE, TILE_SIZE, TILE_SIZE, UnitPixel},
@@ -93,7 +117,7 @@ public:
     }
 
     // x, y - cell coordinates (not pixels)
-    void draw(Graphics* g, TextureCoordinates* meta, int x, int y) {
+    void draw(Graphics* g, TextureCoordinates* meta, REAL x, REAL y) {
         RectF dest = RectF(x * cellSize, y * cellSize + offsetY, cellSize, cellSize);
         g->DrawImage(texture, dest, meta->x, meta->y, meta->width - 0.5, meta->height -0.5,
             meta->unit);

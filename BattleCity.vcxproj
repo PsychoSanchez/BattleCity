@@ -102,6 +102,7 @@
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Wall.cpp" />
+    <ClCompile Include="Pickup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BattleCity.rc" />
